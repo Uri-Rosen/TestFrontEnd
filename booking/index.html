@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
     <!-- Font Awesome via CDN (Kit was problematic, direct CSS better for compatibility) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="../styles.css"><option value="color_regular_ampule">צבע ואמפולה</option>
+    <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
     <div class="d-flex flex-column min-vh-100">
@@ -51,41 +51,38 @@
                 <!-- Step 1: Service Selection -->
                 <div class="step active" id="step-1">
                     <div class="form-group">
-                        <label for="haircutType" class="text-right">סוג שירות:</label>
-                        <select class="form-control" id="haircutType" name="haircutType" required>
-                            <option value="">בחרו סוג שירות</option>
-                            <!-- Options will be populated by JavaScript (loadServices) -->
-                            <!-- Example static options (to be replaced by dynamic loading, but useful for structure) -->
-                            <!-- Keep this list in sync with SERVICES in server.js for consistency if JS fails -->
-                            <option value="mens_cut">תספורת גברים</option>
-                            <option value="mens_cut_beard">תספורת גברים עם זקן</option>
-                            <option value="womens_cut">תספורת נשים</option>
-                            <option value="blow_dry">פן</option>
+                        <label for="baseService" class="text-right">שירות בסיסי:</label>
+                        <select class="form-control" id="baseService" required>
+                            <option value="">בחרו שירות בסיסי</option>
                             <option value="color_regular">צבע</option>
                             <option value="color_inoa">צבע אינואה</option>
-                            <option value="color_regular_womens_cut">צבע ותספורת נשים</option>
-                            <option value="color_inoa_womens_cut">צבע אינואה ותספורת נשים</option>
-                            <option value="color_regular_blow_dry">צבע ופן</option>
-                            <option value="color_inoa_blow_dry">צבע אינואה ופן</option>
-                            <option value="color_regular_womens_cut_blow_dry">צבע, תספורת נשים ופן</option>
-                            <option value="color_inoa_womens_cut_blow_dry">צבע אינואה, תספורת נשים ופן</option>
                             <option value="ampule">טיפול אמפולה</option>
-                            <option value="ampule_blow_dry">אמפולה ופן</option>
-                            <option value="color_regular_ampule">צבע ואמפולה</option>
-                            <option value="color_inoa_ampule">צבע אינואה ואמפולה</option>
-                            <option value="color_regular_ampule_blow_dry">צבע, אמפולה ופן</option>
-                            <option value="color_inoa_ampule_blow_dry">צבע אינואה, אמפולה ופן</option>
-                            <option value="color_regular_ampule_womens_cut">צבע, אמפולה ותספורת</option>
-                            <option value="color_inoa_ampule_womens_cut">צבע אינואה, אמפולה ותספורת</option>
-
+                            <option value="womens_cut">תספורת נשים</option>
+                            <option value="blow_dry">פן</option>
+                            <option value="mens_cut">תספורת גברים</option>
+                            <option value="mens_cut_beard">תספורת גברים עם זקן</option>
                             <option value="gvanim">גוונים</option>
                             <option value="keratin">החלקת קרטין</option>
                         </select>
                         <div class="invalid-feedback">אנא בחרו סוג שירות.</div>
                     </div>
-                    <div class="step-buttons">
-                        <!-- No buttons needed here, selection auto-advances or enables next step -->
+                    <div class="form-group" id="additionalServices" style="display:none;">
+                        <label class="text-right">הוספת שירותים:</label>
+                        <div class="form-check">
+                            <input class="form-check-input addon-checkbox" type="checkbox" value="ampule" id="addonAmpule">
+                            <label class="form-check-label" for="addonAmpule">אמפולה</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input addon-checkbox" type="checkbox" value="womens_cut" id="addonWomensCut">
+                            <label class="form-check-label" for="addonWomensCut">תספורת נשים</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input addon-checkbox" type="checkbox" value="blow_dry" id="addonBlowDry">
+                            <label class="form-check-label" for="addonBlowDry">פן</label>
+                        </div>
                     </div>
+                    <select id="haircutType" name="haircutType" style="display:none;" required></select>
+                    <div class="step-buttons"></div>
                 </div>
 
                 <!-- Step 2: Date Selection -->
