@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function mapServiceKey(base, addons) {
     const set = new Set(addons);
     const comboBases = ['color_regular', 'color_inoa', 'ampule', 'womens_cut', 'blow_dry'];
-    const extrasOrder = ['ampule', 'womens_cut', 'blow_dry'];
+    const extrasOrder = ['color_regular', 'color_inoa', 'ampule', 'womens_cut', 'blow_dry'];
 
     if (comboBases.includes(base)) {
       const parts = [base];
@@ -100,26 +100,36 @@ document.addEventListener('DOMContentLoaded', function() {
     const ampuleDiv = document.getElementById('addonAmpule')?.parentElement;
     const womensDiv = document.getElementById('addonWomensCut')?.parentElement;
     const blowDiv = document.getElementById('addonBlowDry')?.parentElement;
+    const colorRegDiv = document.getElementById('addonColorRegular')?.parentElement;
+    const colorInoaDiv = document.getElementById('addonColorInoa')?.parentElement;
 
     if (['color_regular', 'color_inoa', 'ampule', 'womens_cut', 'blow_dry', 'mens_cut'].includes(baseVal)) {
       addonsContainer.style.display = 'block';
       if (baseVal === 'mens_cut') {
         beardDiv.style.display = 'block';
-        ampuleDiv.style.display = 'none';
-        womensDiv.style.display = 'none';
-        blowDiv.style.display = 'none';
-        document.getElementById('addonAmpule').checked = false;
-        document.getElementById('addonWomensCut').checked = false;
-        document.getElementById('addonBlowDry').checked = false;
+        [ampuleDiv, womensDiv, blowDiv, colorRegDiv, colorInoaDiv].forEach(div => { if (div) div.style.display = 'none'; });
+        ['addonAmpule','addonWomensCut','addonBlowDry','addonColorRegular','addonColorInoa'].forEach(id => {
+          const cb = document.getElementById(id); if (cb) cb.checked = false; });
       } else {
         beardDiv.style.display = 'none';
         document.getElementById('addonBeardTrim').checked = false;
-        ampuleDiv.style.display = baseVal === 'ampule' ? 'none' : 'block';
-        womensDiv.style.display = baseVal === 'womens_cut' ? 'none' : 'block';
-        blowDiv.style.display = baseVal === 'blow_dry' ? 'none' : 'block';
-        if (baseVal === 'ampule') document.getElementById('addonAmpule').checked = false;
-        if (baseVal === 'womens_cut') document.getElementById('addonWomensCut').checked = false;
-        if (baseVal === 'blow_dry') document.getElementById('addonBlowDry').checked = false;
+        const mapping = {
+          color_regular: 'addonColorRegular',
+          color_inoa: 'addonColorInoa',
+          ampule: 'addonAmpule',
+          womens_cut: 'addonWomensCut',
+          blow_dry: 'addonBlowDry'
+        };
+        [colorRegDiv, colorInoaDiv, ampuleDiv, womensDiv, blowDiv].forEach((div, idx) => {
+          const key = ['color_regular','color_inoa','ampule','womens_cut','blow_dry'][idx];
+          if (!div) return;
+          if (key === baseVal) {
+            div.style.display = 'none';
+            const cb = document.getElementById(mapping[key]); if (cb) cb.checked = false;
+          } else {
+            div.style.display = 'block';
+          }
+        });
       }
     } else {
       addonsContainer.style.display = 'none';
@@ -338,7 +348,7 @@ document.addEventListener('DOMContentLoaded', function() {
               serviceName: hebrewServiceName
             };
             localStorage.setItem('appointmentDetails', JSON.stringify(appointmentDetails));
-            window.location.href = '../confirmation/';
+            window.location.href = '../confirmation/index.html';
           }
         } catch (err) {
           console.error("[bookingForm submit] Booking error:", err);
