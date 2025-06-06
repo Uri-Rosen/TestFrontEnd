@@ -34,7 +34,7 @@
     <div class="d-flex flex-column min-vh-100">
         <!-- תפריט ניווט -->
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="../index.html">
+            <a class="navbar-brand" href="/TestFrontEnd/index.html">
                 <img src="../images/logo.png" alt="לוגו המספרה" height="60">
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse"
@@ -46,7 +46,7 @@
                  id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="../index.html">בית</a>
+                        <a class="nav-link" href="/TestFrontEnd/index.html">בית</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="../booking/">קביעת תור</a>
@@ -69,7 +69,7 @@
             <p>נשמח לראותך במספרה.</p>
             <!-- הודעת הספירה לאחור -->
             <p id="redirectMessage">תועבר אוטומטית לעמוד הבית בעוד <span id="countdown">5</span> שניות.</p>
-            <a href="../index.html" class="btn btn-primary mt-3 mb-3">חזרה לדף הבית</a>
+            <a href="/TestFrontEnd/index.html" class="btn btn-primary mt-3 mb-3">חזרה לדף הבית</a>
         </div>
 
         <!-- Footer -->
@@ -128,13 +128,13 @@
                     countdownElement.textContent = countdown;
                     if (countdown <= 0) {
                         clearInterval(countdownInterval);
-                        window.location.href = '../index.html'; // Redirect to home page
+                        window.location.href = '/TestFrontEnd/index.html'; // Redirect to home page
                     }
                 }, 1000); // עדכון כל שנייה (1000 מילישניות)
             } else if (redirectMessageElement) {
                 // Fallback if only redirectMessage is there (e.g., no countdown span)
                 setTimeout(() => {
-                     window.location.href = '../index.html';
+                     window.location.href = '/TestFrontEnd/index.html';
                 }, 5000);
             }
         });
