@@ -15,20 +15,17 @@ document.addEventListener('DOMContentLoaded', function() {
   function mapServiceKey(base, addons) {
     const set = new Set(addons);
     const comboBases = ['color_regular', 'color_inoa', 'ampule', 'womens_cut', 'blow_dry'];
-    const extrasOrder = ['color_regular', 'color_inoa', 'ampule', 'womens_cut', 'blow_dry'];
 
     if (comboBases.includes(base)) {
-      const parts = [base];
-      extrasOrder.forEach(extra => {
-        if (extra !== base && set.has(extra)) parts.push(extra);
-      });
-      return parts.join('_');
-    } else if (base === 'mens_cut') {
-      if (set.has('beard_trim')) return 'mens_cut_beard';
-      return 'mens_cut';
-    } else {
-      return base;
+      const extras = comboBases.filter(extra => extra !== base && set.has(extra));
+      return [base, ...extras].join('_');
     }
+
+    if (base === 'mens_cut') {
+      return set.has('beard_trim') ? 'mens_cut_beard' : 'mens_cut';
+    }
+
+    return base;
   }
 
   function updateServiceKey() {
