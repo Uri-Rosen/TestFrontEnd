@@ -128,13 +128,13 @@
                     countdownElement.textContent = countdown;
                     if (countdown <= 0) {
                         clearInterval(countdownInterval);
-                        window.location.href = '/'; // Redirect to home page
+                        window.location.href = '../index.html'; // Redirect to home page
                     }
                 }, 1000); // עדכון כל שנייה (1000 מילישניות)
             } else if (redirectMessageElement) {
                 // Fallback if only redirectMessage is there (e.g., no countdown span)
                 setTimeout(() => {
-                     window.location.href = '/';
+                     window.location.href = '../index.html';
                 }, 5000);
             }
         });
