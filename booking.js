@@ -332,7 +332,7 @@ document.addEventListener('DOMContentLoaded', function() {
               serviceName: hebrewServiceName
             };
             localStorage.setItem('appointmentDetails', JSON.stringify(appointmentDetails));
-            window.location.href = '/confirmation/';
+            window.location.href = 'confirmation/';
           }
         } catch (err) {
           console.error("[bookingForm submit] Booking error:", err);
