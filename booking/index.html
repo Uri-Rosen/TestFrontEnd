@@ -51,16 +51,15 @@
                 <!-- Step 1: Service Selection -->
                 <div class="step active" id="step-1">
                     <div class="form-group">
-                        <label for="baseService" class="text-right">שירות בסיסי:</label>
+                        <label for="baseService" class="text-right">שירות:</label>
                         <select class="form-control" id="baseService" required>
-                            <option value="">בחרו שירות בסיסי</option>
+                            <option value="">בחרו שירות</option>
                             <option value="color_regular">צבע</option>
                             <option value="color_inoa">צבע אינואה</option>
                             <option value="ampule">טיפול אמפולה</option>
                             <option value="womens_cut">תספורת נשים</option>
                             <option value="blow_dry">פן</option>
                             <option value="mens_cut">תספורת גברים</option>
-                            <option value="mens_cut_beard">תספורת גברים עם זקן</option>
                             <option value="gvanim">גוונים</option>
                             <option value="keratin">החלקת קרטין</option>
                         </select>
@@ -80,9 +79,15 @@
                             <input class="form-check-input addon-checkbox" type="checkbox" value="blow_dry" id="addonBlowDry">
                             <label class="form-check-label" for="addonBlowDry">פן</label>
                         </div>
+                        <div class="form-check">
+                            <input class="form-check-input addon-checkbox" type="checkbox" value="beard_trim" id="addonBeardTrim">
+                            <label class="form-check-label" for="addonBeardTrim">תספורת זקן</label>
+                        </div>
                     </div>
                     <select id="haircutType" name="haircutType" style="display:none;" required></select>
-                    <div class="step-buttons"></div>
+                    <div class="step-buttons text-left">
+                        <button type="button" class="btn btn-primary" id="nextBtn-1">הבא</button>
+                    </div>
                 </div>
 
                 <!-- Step 2: Date Selection -->
@@ -97,8 +102,9 @@
                         </div>
                         <div class="invalid-feedback">אנא בחרו תאריך.</div>
                     </div>
-                    <div class="step-buttons text-left">
+                    <div class="step-buttons d-flex justify-content-between">
                         <button type="button" class="btn btn-secondary" id="prevBtn-2">חזור</button>
+                        <button type="button" class="btn btn-primary" id="nextBtn-2">הבא</button>
                     </div>
                 </div>
 
@@ -111,8 +117,9 @@
                         </select>
                         <div class="invalid-feedback">אנא בחרו שעה.</div>
                     </div>
-                    <div class="step-buttons text-left">
+                    <div class="step-buttons d-flex justify-content-between">
                         <button type="button" class="btn btn-secondary" id="prevBtn-3">חזור</button>
+                        <button type="button" class="btn btn-primary" id="nextBtn-3">הבא</button>
                     </div>
                 </div>
 
