@@ -14,27 +14,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function mapServiceKey(base, addons) {
     const set = new Set(addons);
-    if (base === 'color_regular' || base === 'color_inoa') {
-      const prefix = base;
-      if (set.has('ampule') && set.has('womens_cut') && set.has('blow_dry')) {
-        return `${prefix}_ampule_womens_cut_blow_dry`;
-      }
-      if (set.has('ampule') && set.has('womens_cut')) {
-        return `${prefix}_ampule_womens_cut`;
-      }
-      if (set.has('ampule') && set.has('blow_dry')) {
-        return `${prefix}_ampule_blow_dry`;
-      }
-      if (set.has('womens_cut') && set.has('blow_dry')) {
-        return `${prefix}_womens_cut_blow_dry`;
-      }
-      if (set.has('ampule')) return `${prefix}_ampule`;
-      if (set.has('womens_cut')) return `${prefix}_womens_cut`;
-      if (set.has('blow_dry')) return `${prefix}_blow_dry`;
-      return prefix;
-    } else if (base === 'ampule') {
-      if (set.has('blow_dry')) return 'ampule_blow_dry';
-      return 'ampule';
+    const comboBases = ['color_regular', 'color_inoa', 'ampule', 'womens_cut', 'blow_dry'];
+    const extrasOrder = ['ampule', 'womens_cut', 'blow_dry'];
+
+    if (comboBases.includes(base)) {
+      const parts = [base];
+      extrasOrder.forEach(extra => {
+        if (extra !== base && set.has(extra)) parts.push(extra);
+      });
+      return parts.join('_');
+    } else if (base === 'mens_cut') {
+      if (set.has('beard_trim')) return 'mens_cut_beard';
+      return 'mens_cut';
     } else {
       return base;
     }
@@ -98,15 +89,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
         removeValidationError(dateInput);
         loadAvailableTimes(dateInput.value);
-        goToStep(2); // To Time selection (0-indexed)
     } else {
         timeSelect.innerHTML = '<option value="">נא לבחור תאריך</option>';
     }
   });
 
   baseServiceSelect.addEventListener('change', function() {
-    if (baseServiceSelect.value === 'color_regular' || baseServiceSelect.value === 'color_inoa' || baseServiceSelect.value === 'ampule') {
+    const baseVal = baseServiceSelect.value;
+    const beardDiv = document.getElementById('addonBeardTrim')?.parentElement;
+    const ampuleDiv = document.getElementById('addonAmpule')?.parentElement;
+    const womensDiv = document.getElementById('addonWomensCut')?.parentElement;
+    const blowDiv = document.getElementById('addonBlowDry')?.parentElement;
+
+    if (['color_regular', 'color_inoa', 'ampule', 'womens_cut', 'blow_dry', 'mens_cut'].includes(baseVal)) {
       addonsContainer.style.display = 'block';
+      if (baseVal === 'mens_cut') {
+        beardDiv.style.display = 'block';
+        ampuleDiv.style.display = 'none';
+        womensDiv.style.display = 'none';
+        blowDiv.style.display = 'none';
+        document.getElementById('addonAmpule').checked = false;
+        document.getElementById('addonWomensCut').checked = false;
+        document.getElementById('addonBlowDry').checked = false;
+      } else {
+        beardDiv.style.display = 'none';
+        document.getElementById('addonBeardTrim').checked = false;
+        ampuleDiv.style.display = baseVal === 'ampule' ? 'none' : 'block';
+        womensDiv.style.display = baseVal === 'womens_cut' ? 'none' : 'block';
+        blowDiv.style.display = baseVal === 'blow_dry' ? 'none' : 'block';
+        if (baseVal === 'ampule') document.getElementById('addonAmpule').checked = false;
+        if (baseVal === 'womens_cut') document.getElementById('addonWomensCut').checked = false;
+        if (baseVal === 'blow_dry') document.getElementById('addonBlowDry').checked = false;
+      }
     } else {
       addonsContainer.style.display = 'none';
       addonCheckboxes.forEach(c => c.checked = false);
@@ -146,24 +160,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
       if (dateInput.value && /^\d{4}-\d{2}-\d{2}$/.test(dateInput.value)) {
           loadAvailableTimes(dateInput.value);
-          goToStep(2);
-      } else {
-          goToStep(1); // To date selection
-          // Auto-opening datepicker will be handled by goToStep if current step becomes 1
       }
     } else {
         submitBtn.textContent = 'קבעו תור';
         submitBtn.classList.remove('btn-success');
         submitBtn.classList.add('btn-primary');
-        goToStep(0);
     }
   });
 
   timeSelect.addEventListener('change', function() {
     removeValidationError(timeSelect);
-    if (timeSelect.value) {
-      goToStep(3); // To First Name (0-indexed)
-    }
   });
 
   async function loadAvailableTimes(dateStr) {
@@ -332,7 +338,7 @@ document.addEventListener('DOMContentLoaded', function() {
               serviceName: hebrewServiceName
             };
             localStorage.setItem('appointmentDetails', JSON.stringify(appointmentDetails));
-            window.location.href = 'confirmation/';
+            window.location.href = '../confirmation/';
           }
         } catch (err) {
           console.error("[bookingForm submit] Booking error:", err);
@@ -523,8 +529,17 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   document.getElementById('prevBtn-2')?.addEventListener('click', () => goToStep(0));
+  document.getElementById('nextBtn-1')?.addEventListener('click', () => {
+    if (validateSingleStepInputs(steps[0])) goToStep(1);
+  });
   document.getElementById('prevBtn-3')?.addEventListener('click', () => goToStep(1));
+  document.getElementById('nextBtn-2')?.addEventListener('click', () => {
+    if (validateSingleStepInputs(steps[1])) goToStep(2);
+  });
   document.getElementById('prevBtn-4')?.addEventListener('click', () => goToStep(2));
+  document.getElementById('nextBtn-3')?.addEventListener('click', () => {
+    if (validateSingleStepInputs(steps[2])) goToStep(3);
+  });
 
   document.getElementById('nextBtn-4')?.addEventListener('click', () => {
     if(validateSingleStepInputs(steps[3])) goToStep(4);
