@@ -2,12 +2,50 @@ document.addEventListener('DOMContentLoaded', function() {
   const SERVER_BASE_URL = 'https://hairformation-backend.onrender.com';
 
   const haircutTypeSelect = document.getElementById('haircutType');
+  const baseServiceSelect = document.getElementById('baseService');
+  const addonsContainer = document.getElementById('additionalServices');
+  const addonCheckboxes = document.querySelectorAll('.addon-checkbox');
   const dateInput = document.getElementById('date');
   const timeSelect = document.getElementById('time');
   const bookingForm = document.getElementById('bookingForm');
   const submitBtn = document.getElementById('submitBtn');
 
   let allServicesData = [];
+
+  function mapServiceKey(base, addons) {
+    const set = new Set(addons);
+    if (base === 'color_regular' || base === 'color_inoa') {
+      const prefix = base;
+      if (set.has('ampule') && set.has('womens_cut') && set.has('blow_dry')) {
+        return `${prefix}_ampule_womens_cut_blow_dry`;
+      }
+      if (set.has('ampule') && set.has('womens_cut')) {
+        return `${prefix}_ampule_womens_cut`;
+      }
+      if (set.has('ampule') && set.has('blow_dry')) {
+        return `${prefix}_ampule_blow_dry`;
+      }
+      if (set.has('womens_cut') && set.has('blow_dry')) {
+        return `${prefix}_womens_cut_blow_dry`;
+      }
+      if (set.has('ampule')) return `${prefix}_ampule`;
+      if (set.has('womens_cut')) return `${prefix}_womens_cut`;
+      if (set.has('blow_dry')) return `${prefix}_blow_dry`;
+      return prefix;
+    } else if (base === 'ampule') {
+      if (set.has('blow_dry')) return 'ampule_blow_dry';
+      return 'ampule';
+    } else {
+      return base;
+    }
+  }
+
+  function updateServiceKey() {
+    const base = baseServiceSelect.value;
+    const addons = Array.from(addonCheckboxes).filter(c => c.checked).map(c => c.value);
+    const key = base ? mapServiceKey(base, addons) : '';
+    haircutTypeSelect.value = key;
+  }
 
   async function loadServices() {
     try {
@@ -66,8 +104,24 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
+  baseServiceSelect.addEventListener('change', function() {
+    if (baseServiceSelect.value === 'color_regular' || baseServiceSelect.value === 'color_inoa' || baseServiceSelect.value === 'ampule') {
+      addonsContainer.style.display = 'block';
+    } else {
+      addonsContainer.style.display = 'none';
+      addonCheckboxes.forEach(c => c.checked = false);
+    }
+    updateServiceKey();
+    haircutTypeSelect.dispatchEvent(new Event('change'));
+  });
+
+  addonCheckboxes.forEach(cb => cb.addEventListener('change', () => {
+    updateServiceKey();
+    haircutTypeSelect.dispatchEvent(new Event('change'));
+  }));
+
   haircutTypeSelect.addEventListener('change', function() {
-    removeValidationError(haircutTypeSelect);
+    removeValidationError(baseServiceSelect);
     const selectedOption = haircutTypeSelect.options[haircutTypeSelect.selectedIndex];
 
     timeSelect.innerHTML = '<option value="">בחרו תאריך ושירות</option>';
@@ -304,11 +358,11 @@ document.addEventListener('DOMContentLoaded', function() {
     if (existingFormError) existingFormError.remove();
 
     const selectedOption = haircutTypeSelect.options[haircutTypeSelect.selectedIndex];
-    if (!haircutTypeSelect.value || !selectedOption || selectedOption.value === "") {
-      showValidationError(haircutTypeSelect, 'אנא בחרו סוג שירות.');
+    if (!baseServiceSelect.value || !selectedOption || selectedOption.value === "") {
+      showValidationError(baseServiceSelect, 'אנא בחרו סוג שירות.');
       isValid = false;
     } else {
-      removeValidationError(haircutTypeSelect);
+      removeValidationError(baseServiceSelect);
     }
 
     const isBookableOnline = selectedOption ? selectedOption.dataset.bookableOnline === 'true' : false;
@@ -524,6 +578,8 @@ document.addEventListener('DOMContentLoaded', function() {
     return `${year}-${month}-${day}`;
   }
 
-  loadServices();
+  loadServices().then(() => {
+    updateServiceKey();
+  });
   goToStep(0);
 });
