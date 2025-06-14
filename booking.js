@@ -39,36 +39,67 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function mapServiceKey(base, addons) {
     const set = new Set(addons);
-    let candidate = '';
-    if (base === 'color_regular' || base === 'color_inoa') {
-      const prefix = base;
-      if (set.has('ampule') && set.has('womens_cut') && set.has('blow_dry')) {
-        candidate = '';
-      } else if (set.has('ampule') && set.has('womens_cut')) {
-        candidate = `${prefix}_ampule_womens_cut`;
-      } else if (set.has('ampule') && set.has('blow_dry')) {
-        candidate = `${prefix}_ampule_blow_dry`;
-      } else if (set.has('womens_cut') && set.has('blow_dry')) {
-        candidate = `${prefix}_womens_cut_blow_dry`;
-      } else if (set.has('ampule')) {
-        candidate = `${prefix}_ampule`;
-      } else if (set.has('womens_cut')) {
-        candidate = `${prefix}_womens_cut`;
-      } else if (set.has('blow_dry')) {
-        candidate = `${prefix}_blow_dry`;
-      } else {
-        candidate = prefix;
-      }
-    } else if (base === 'ampule') {
-      if (set.has('blow_dry')) candidate = 'ampule_blow_dry';
-      else candidate = 'ampule';
-    } else if (base === 'mens_cut') {
-      if (set.has('beard_trim')) candidate = 'mens_cut_beard';
-      else candidate = 'mens_cut';
-    } else {
-      candidate = base;
+
+    // determine selected color (only one allowed)
+    let color = null;
+    if (base === 'color_regular' || set.has('color_regular')) {
+      color = 'color_regular';
     }
-    return ALLOWED_SERVICE_KEYS.has(candidate) ? candidate : '';
+    if (base === 'color_inoa' || set.has('color_inoa')) {
+      if (color) return '';
+      color = 'color_inoa';
+    }
+
+    const hasAmpule = base === 'ampule' || set.has('ampule');
+    const hasWomensCut = base === 'womens_cut' || set.has('womens_cut');
+    const hasBlowDry = base === 'blow_dry' || set.has('blow_dry');
+
+    if (base === 'mens_cut') {
+      const hasBeard = set.has('beard_trim');
+      const candidate = hasBeard ? 'mens_cut_beard' : 'mens_cut';
+      return ALLOWED_SERVICE_KEYS.has(candidate) ? candidate : '';
+    }
+
+    if (base === 'gvanim' || base === 'keratin') {
+      return ALLOWED_SERVICE_KEYS.has(base) && addons.length === 0 ? base : '';
+    }
+
+    if (color) {
+      const prefix = color;
+      if (hasAmpule && hasWomensCut && hasBlowDry) {
+        return '';
+      } else if (hasAmpule && hasWomensCut) {
+        return ALLOWED_SERVICE_KEYS.has(`${prefix}_ampule_womens_cut`) ? `${prefix}_ampule_womens_cut` : '';
+      } else if (hasAmpule && hasBlowDry) {
+        return ALLOWED_SERVICE_KEYS.has(`${prefix}_ampule_blow_dry`) ? `${prefix}_ampule_blow_dry` : '';
+      } else if (hasWomensCut && hasBlowDry) {
+        return ALLOWED_SERVICE_KEYS.has(`${prefix}_womens_cut_blow_dry`) ? `${prefix}_womens_cut_blow_dry` : '';
+      } else if (hasAmpule) {
+        return ALLOWED_SERVICE_KEYS.has(`${prefix}_ampule`) ? `${prefix}_ampule` : '';
+      } else if (hasWomensCut) {
+        return ALLOWED_SERVICE_KEYS.has(`${prefix}_womens_cut`) ? `${prefix}_womens_cut` : '';
+      } else if (hasBlowDry) {
+        return ALLOWED_SERVICE_KEYS.has(`${prefix}_blow_dry`) ? `${prefix}_blow_dry` : '';
+      }
+      return ALLOWED_SERVICE_KEYS.has(prefix) ? prefix : '';
+    }
+
+    if (hasAmpule) {
+      if (hasWomensCut) return '';
+      if (hasBlowDry) return ALLOWED_SERVICE_KEYS.has('ampule_blow_dry') ? 'ampule_blow_dry' : '';
+      return ALLOWED_SERVICE_KEYS.has('ampule') ? 'ampule' : '';
+    }
+
+    if (hasWomensCut) {
+      if (hasBlowDry) return '';
+      return ALLOWED_SERVICE_KEYS.has('womens_cut') ? 'womens_cut' : '';
+    }
+
+    if (hasBlowDry) {
+      return ALLOWED_SERVICE_KEYS.has('blow_dry') ? 'blow_dry' : '';
+    }
+
+    return ALLOWED_SERVICE_KEYS.has(base) ? base : '';
   }
 
   function updateServiceKey(changedCb) {
@@ -145,12 +176,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const ampuleDiv = document.getElementById('addonAmpule')?.parentElement;
     const womensDiv = document.getElementById('addonWomensCut')?.parentElement;
     const blowDiv = document.getElementById('addonBlowDry')?.parentElement;
+    const colorRegDiv = document.getElementById('addonColorRegular')?.parentElement;
+    const colorInoaDiv = document.getElementById('addonColorInoa')?.parentElement;
 
     addonCheckboxes.forEach(c => c.checked = false);
     beardDiv.style.display = 'none';
     ampuleDiv.style.display = 'none';
     womensDiv.style.display = 'none';
     blowDiv.style.display = 'none';
+    if (colorRegDiv) colorRegDiv.style.display = 'none';
+    if (colorInoaDiv) colorInoaDiv.style.display = 'none';
 
     if (baseVal === 'mens_cut') {
       addonsContainer.style.display = 'block';
@@ -163,6 +198,21 @@ document.addEventListener('DOMContentLoaded', function() {
     } else if (baseVal === 'ampule') {
       addonsContainer.style.display = 'block';
       blowDiv.style.display = 'block';
+      if (colorRegDiv) colorRegDiv.style.display = 'block';
+      if (colorInoaDiv) colorInoaDiv.style.display = 'block';
+      womensDiv.style.display = 'block';
+    } else if (baseVal === 'blow_dry') {
+      addonsContainer.style.display = 'block';
+      ampuleDiv.style.display = 'block';
+      womensDiv.style.display = 'block';
+      if (colorRegDiv) colorRegDiv.style.display = 'block';
+      if (colorInoaDiv) colorInoaDiv.style.display = 'block';
+    } else if (baseVal === 'womens_cut') {
+      addonsContainer.style.display = 'block';
+      ampuleDiv.style.display = 'block';
+      blowDiv.style.display = 'block';
+      if (colorRegDiv) colorRegDiv.style.display = 'block';
+      if (colorInoaDiv) colorInoaDiv.style.display = 'block';
     } else {
       addonsContainer.style.display = 'none';
     }
