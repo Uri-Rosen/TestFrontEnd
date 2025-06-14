@@ -299,3 +299,8 @@ h1 {
     line-height: 25px;
     font-size: 1em;
 }
+#additionalServices .disabled-addon label {
+    color: #6c757d;
+    cursor: not-allowed;
+}
+#additionalServices .disabled-addon input{pointer-events:none;}
