@@ -113,6 +113,41 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     haircutTypeSelect.value = key;
   }
+function updateAddonState() {
+  const baseVal = baseServiceSelect.value;
+  const ampuleCb = document.getElementById('addonAmpule');
+  const blowCb = document.getElementById('addonBlowDry');
+  const colorRegCb = document.getElementById('addonColorRegular');
+  const colorInoaCb = document.getElementById('addonColorInoa');
+
+  if (baseVal === 'womens_cut') {
+    if (colorRegCb && addonsContainer.firstChild !== colorRegCb.parentElement) {
+      addonsContainer.prepend(colorRegCb.parentElement);
+    }
+    if (colorInoaCb && addonsContainer.children[1] !== colorInoaCb.parentElement) {
+      addonsContainer.insertBefore(colorInoaCb.parentElement, addonsContainer.children[1] || null);
+    }
+    const colorSelected = (colorRegCb && colorRegCb.checked) || (colorInoaCb && colorInoaCb.checked);
+    [ampuleCb, blowCb].forEach(cb => {
+      if (!cb) return;
+      if (!colorSelected) {
+        cb.checked = false;
+        cb.disabled = true;
+        cb.parentElement.classList.add('disabled-addon');
+      } else {
+        cb.disabled = false;
+        cb.parentElement.classList.remove('disabled-addon');
+      }
+    });
+  } else {
+    [ampuleCb, blowCb].forEach(cb => {
+      if (cb) {
+        cb.disabled = false;
+        cb.parentElement.classList.remove('disabled-addon');
+      }
+    });
+  }
+}
 
   async function loadServices() {
     try {
@@ -217,11 +252,13 @@ document.addEventListener('DOMContentLoaded', function() {
       addonsContainer.style.display = 'none';
     }
     updateServiceKey();
+    updateAddonState();
     haircutTypeSelect.dispatchEvent(new Event('change'));
   });
 
   addonCheckboxes.forEach(cb => cb.addEventListener('change', () => {
     updateServiceKey(cb);
+    updateAddonState();
     haircutTypeSelect.dispatchEvent(new Event('change'));
   }));
 
@@ -686,6 +723,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   loadServices().then(() => {
     updateServiceKey();
+    updateAddonState();
   });
   goToStep(0);
 });
