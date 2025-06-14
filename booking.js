@@ -12,41 +12,74 @@ document.addEventListener('DOMContentLoaded', function() {
 
   let allServicesData = [];
 
+  const ALLOWED_SERVICE_KEYS = new Set([
+    'mens_cut',
+    'mens_cut_beard',
+    'womens_cut',
+    'blow_dry',
+    'color_regular',
+    'color_inoa',
+    'color_regular_womens_cut',
+    'color_inoa_womens_cut',
+    'color_regular_blow_dry',
+    'color_inoa_blow_dry',
+    'color_regular_womens_cut_blow_dry',
+    'color_inoa_womens_cut_blow_dry',
+    'ampule',
+    'ampule_blow_dry',
+    'color_regular_ampule',
+    'color_inoa_ampule',
+    'color_regular_ampule_blow_dry',
+    'color_inoa_ampule_blow_dry',
+    'color_regular_ampule_womens_cut',
+    'color_inoa_ampule_womens_cut',
+    'gvanim',
+    'keratin'
+  ]);
+
   function mapServiceKey(base, addons) {
     const set = new Set(addons);
+    let candidate = '';
     if (base === 'color_regular' || base === 'color_inoa') {
       const prefix = base;
       if (set.has('ampule') && set.has('womens_cut') && set.has('blow_dry')) {
-        return `${prefix}_ampule_womens_cut_blow_dry`;
+        candidate = '';
+      } else if (set.has('ampule') && set.has('womens_cut')) {
+        candidate = `${prefix}_ampule_womens_cut`;
+      } else if (set.has('ampule') && set.has('blow_dry')) {
+        candidate = `${prefix}_ampule_blow_dry`;
+      } else if (set.has('womens_cut') && set.has('blow_dry')) {
+        candidate = `${prefix}_womens_cut_blow_dry`;
+      } else if (set.has('ampule')) {
+        candidate = `${prefix}_ampule`;
+      } else if (set.has('womens_cut')) {
+        candidate = `${prefix}_womens_cut`;
+      } else if (set.has('blow_dry')) {
+        candidate = `${prefix}_blow_dry`;
+      } else {
+        candidate = prefix;
       }
-      if (set.has('ampule') && set.has('womens_cut')) {
-        return `${prefix}_ampule_womens_cut`;
-      }
-      if (set.has('ampule') && set.has('blow_dry')) {
-        return `${prefix}_ampule_blow_dry`;
-      }
-      if (set.has('womens_cut') && set.has('blow_dry')) {
-        return `${prefix}_womens_cut_blow_dry`;
-      }
-      if (set.has('ampule')) return `${prefix}_ampule`;
-      if (set.has('womens_cut')) return `${prefix}_womens_cut`;
-      if (set.has('blow_dry')) return `${prefix}_blow_dry`;
-      return prefix;
     } else if (base === 'ampule') {
-      if (set.has('blow_dry')) return 'ampule_blow_dry';
-      return 'ampule';
+      if (set.has('blow_dry')) candidate = 'ampule_blow_dry';
+      else candidate = 'ampule';
     } else if (base === 'mens_cut') {
-      if (set.has('beard_trim')) return 'mens_cut_beard';
-      return 'mens_cut';
+      if (set.has('beard_trim')) candidate = 'mens_cut_beard';
+      else candidate = 'mens_cut';
     } else {
-      return base;
+      candidate = base;
     }
+    return ALLOWED_SERVICE_KEYS.has(candidate) ? candidate : '';
   }
 
-  function updateServiceKey() {
+  function updateServiceKey(changedCb) {
     const base = baseServiceSelect.value;
     const addons = Array.from(addonCheckboxes).filter(c => c.checked).map(c => c.value);
-    const key = base ? mapServiceKey(base, addons) : '';
+    let key = base ? mapServiceKey(base, addons) : '';
+    if (base && key === '' && changedCb) {
+      changedCb.checked = false;
+      const validAddons = Array.from(addonCheckboxes).filter(c => c.checked).map(c => c.value);
+      key = mapServiceKey(base, validAddons);
+    }
     haircutTypeSelect.value = key;
   }
 
@@ -113,33 +146,32 @@ document.addEventListener('DOMContentLoaded', function() {
     const womensDiv = document.getElementById('addonWomensCut')?.parentElement;
     const blowDiv = document.getElementById('addonBlowDry')?.parentElement;
 
-    if (baseVal === 'color_regular' || baseVal === 'color_inoa' || baseVal === 'ampule' || baseVal === 'mens_cut') {
+    addonCheckboxes.forEach(c => c.checked = false);
+    beardDiv.style.display = 'none';
+    ampuleDiv.style.display = 'none';
+    womensDiv.style.display = 'none';
+    blowDiv.style.display = 'none';
+
+    if (baseVal === 'mens_cut') {
       addonsContainer.style.display = 'block';
-      if (baseVal === 'mens_cut') {
-        beardDiv.style.display = 'block';
-        ampuleDiv.style.display = 'none';
-        womensDiv.style.display = 'none';
-        blowDiv.style.display = 'none';
-        document.getElementById('addonAmpule').checked = false;
-        document.getElementById('addonWomensCut').checked = false;
-        document.getElementById('addonBlowDry').checked = false;
-      } else {
-        beardDiv.style.display = 'none';
-        document.getElementById('addonBeardTrim').checked = false;
-        ampuleDiv.style.display = 'block';
-        womensDiv.style.display = 'block';
-        blowDiv.style.display = 'block';
-      }
+      beardDiv.style.display = 'block';
+    } else if (baseVal === 'color_regular' || baseVal === 'color_inoa') {
+      addonsContainer.style.display = 'block';
+      ampuleDiv.style.display = 'block';
+      womensDiv.style.display = 'block';
+      blowDiv.style.display = 'block';
+    } else if (baseVal === 'ampule') {
+      addonsContainer.style.display = 'block';
+      blowDiv.style.display = 'block';
     } else {
       addonsContainer.style.display = 'none';
-      addonCheckboxes.forEach(c => c.checked = false);
     }
     updateServiceKey();
     haircutTypeSelect.dispatchEvent(new Event('change'));
   });
 
   addonCheckboxes.forEach(cb => cb.addEventListener('change', () => {
-    updateServiceKey();
+    updateServiceKey(cb);
     haircutTypeSelect.dispatchEvent(new Event('change'));
   }));
 
